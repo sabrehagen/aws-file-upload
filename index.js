@@ -9,6 +9,8 @@ const fs = require('fs-promise');
 const s3fs = require('s3fs');
 //const fs = new s3fs('stemn-s3fs');
 
+app.use(express.static('public'));
+
 app.post('/uploads', (req, res) => {
     const form = new formidable.IncomingForm();
     form.parse(req, (err, fields, files) => {
