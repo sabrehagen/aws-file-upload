@@ -6,8 +6,8 @@ const app = express();
 const util = require('util');
 
 const fs = require('fs-promise');
-const s3fs = require('s3fs');
-//const fs = new s3fs('stemn-s3fs');
+const s3 = require('s3fs');
+const s3fs = new s3('stemn-s3fs');
 
 app.use(express.static('public'));
 
@@ -23,7 +23,7 @@ app.post('/uploads', (req, res) => {
         const destination = path.join('uploads', fileName + '.' + fileExt);
 
         return fs.readFile(source).then((fileData) => {
-            return fs.writeFile(destination, fileData).then(() => {
+            return s3fs.writeFile(destination, fileData).then(() => {
                 fs.unlink(source);
                 res.json({ success: true, url: '/uploads/' + fileName + '.' + fileExt });
             });
@@ -32,8 +32,8 @@ app.post('/uploads', (req, res) => {
 });
 
 app.get('/uploads/:filename', (req, res) => {
-    return fs.readFile(path.join('uploads', req.params.filename)).then((file) => {
-        res.send(file);
+    return s3fs.readFile(path.join('uploads', req.params.filename)).then((file) => {
+        res.write(file.Body);
     });
 });
 
